@@ -3,7 +3,7 @@ import math
 import scrapy
 from urllib.parse import urlencode
 from datetime import datetime
-from walmart_scraper.items import WalmartScraperItem
+from walmart_scrape.items import WalmartScraperItem
 import json
 
 
@@ -274,7 +274,7 @@ class WalmartSpider(scrapy.Spider):
                 "product_image_2_src": raw_product_data["imageInfo"]["allImages"][1][
                     "url"
                 ]
-                if len(raw_product_data["imageInfo"]["allImages"]) >=2
+                if len(raw_product_data["imageInfo"]["allImages"]) >= 2
                 else None,
                 "product_image_3_src": raw_product_data["imageInfo"]["allImages"][2][
                     "url"
