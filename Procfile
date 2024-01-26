@@ -1,1 +1,1 @@
-worker:  cd walmart_scrape && scrapy crawl walmart
+worker:  cd walmart_scraper && scrapy crawl walmart
