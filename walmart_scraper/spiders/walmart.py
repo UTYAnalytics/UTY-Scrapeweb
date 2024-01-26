@@ -3,7 +3,7 @@ import math
 import scrapy
 from urllib.parse import urlencode
 from datetime import datetime
-from walmart_scrape.items import WalmartScraperItem
+from walmart_scraper.items import WalmartScraperItem
 
 
 class WalmartSpider(scrapy.Spider):
