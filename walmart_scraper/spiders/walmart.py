@@ -168,6 +168,11 @@ class WalmartSpider(scrapy.Spider):
                 ".*size.*|.*number_of.*|.*multipack.*",
                 desired_product_id,
             )
+            pack_variants = find_variant_by_pattern(
+                raw_product_data.get("variantCriteria", []),
+                ".*number_of.*|.*multipack.*",
+                desired_product_id,
+            )
 
             yield {
                 "web_scraper_start_url": "walmart",
@@ -271,6 +276,7 @@ class WalmartSpider(scrapy.Spider):
                     {
                         "color": color_variants,
                         "size": size_variants,
+                        "pack": pack_variants,
                     }
                 ),
                 "sys_run_date": datetime.now().strftime(
