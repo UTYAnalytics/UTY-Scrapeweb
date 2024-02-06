@@ -14,7 +14,7 @@ class WalmartSpider(scrapy.Spider):
     custom_settings = {
         "RETRY_HTTP_CODES": [429, 500, 502, 503, 504],
         "RETRY_TIMES": 10,  # Adjust based on how aggressively you wish to retry
-        "DOWNLOAD_DELAY": 1,  # Adjust delay between requests to respect the site's rate limit
+        "DOWNLOAD_DELAY": 10,  # Adjust delay between requests to respect the site's rate limit
         # Uncomment and adjust if you want to specify output format and path dynamically
         # "FEEDS": {
         #     "data/%(name)s_%(time)s.csv": {
@@ -149,6 +149,17 @@ class WalmartSpider(scrapy.Spider):
                     )
             return None
 
+        def extract_pack_quantity(text):
+            if not text:
+                return None
+            # Updated regex to handle titles that are just numbers or contain "pack" variations
+            pack_pattern = re.compile(r"\b(\d+)\s*(packs?|pack of)?\b", re.IGNORECASE)
+            match = pack_pattern.search(text)
+            if match:
+                # Extract the first numeric group found
+                return int(match.group(1))
+            return None
+
         script_tag = response.xpath('//script[@id="__NEXT_DATA__"]/text()').get()
         if script_tag is not None:
             json_blob = json.loads(script_tag)
@@ -168,11 +179,22 @@ class WalmartSpider(scrapy.Spider):
                 ".*size.*",
                 desired_product_id,
             )
-            pack_variants = find_variant_by_pattern(
-                raw_product_data.get("variantCriteria", []),
-                ".*number_of.*|.*multipack.*",
-                desired_product_id,
-            )
+            ## Assuming you have already defined 'product_title' and 'desired_product_id'
+            product_title = raw_product_data.get("name", "")
+
+            # First, try to extract pack quantity directly from the product title
+            pack_quantity = extract_pack_quantity(product_title)
+
+            # If 'pack_quantity' is None, then attempt to find and extract pack info from variant criteria
+            if pack_quantity is None:
+                pack_variant_title = find_variant_by_pattern(
+                    raw_product_data.get("variantCriteria", []),
+                    ".*number_of.*|.*multipack.*|.*pack.*",
+                    desired_product_id,
+                )
+                if pack_variant_title:
+                    # Assuming 'pack_variant_title' returns a string that can be passed to 'extract_pack_quantity'
+                    pack_quantity = extract_pack_quantity(pack_variant_title)
 
             yield {
                 "web_scraper_start_url": "walmart",
@@ -276,7 +298,7 @@ class WalmartSpider(scrapy.Spider):
                     {
                         "color": color_variants,
                         "size": size_variants,
-                        "pack": pack_variants,
+                        "pack": pack_quantity,
                     }
                 ),
                 "sys_run_date": datetime.now().strftime(
