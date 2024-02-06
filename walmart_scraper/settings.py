@@ -37,4 +37,4 @@ ITEM_PIPELINES = {
     "walmart_scraper.pipelinesnew.PostgresNoDuplicatesPipeline": 300,
 }
 # Max Concurrency On ScrapeOps Proxy Free Plan is 1 thread
-CONCURRENT_REQUESTS = 3
+CONCURRENT_REQUESTS = 5
