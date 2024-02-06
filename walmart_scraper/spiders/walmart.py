@@ -183,6 +183,11 @@ class WalmartSpider(scrapy.Spider):
                 ".*size.*",
                 desired_product_id,
             )
+            attr_variants = find_variant_by_pattern(
+                raw_product_data.get("variantCriteria", []),
+                ".*scent.*",
+                desired_product_id,
+            )
             ## Assuming you have already defined 'product_title' and 'desired_product_id'
             product_title = raw_product_data.get("name", "")
 
@@ -300,6 +305,7 @@ class WalmartSpider(scrapy.Spider):
                 ),
                 "product_variants": json.dumps(
                     {
+                        "attr": attr_variants,
                         "color": color_variants,
                         "size": size_variants,
                         "pack": pack_quantity,
