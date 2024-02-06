@@ -153,11 +153,15 @@ class WalmartSpider(scrapy.Spider):
             if not text:
                 return None
             # Updated regex to handle titles that are just numbers or contain "pack" variations
-            pack_pattern = re.compile(r"\b(\d+)\s*(packs?|pack of)?\b", re.IGNORECASE)
+            pack_pattern = re.compile(
+                r"^(\d+)$|(\d+)\s*pack|pack\s*of\s*(\d+)", re.IGNORECASE
+            )
             match = pack_pattern.search(text)
             if match:
-                # Extract the first numeric group found
-                return int(match.group(1))
+                # Check each group for a match and extract the first non-None group
+                for group in match.groups():
+                    if group is not None:
+                        return int(group)
             return None
 
         script_tag = response.xpath('//script[@id="__NEXT_DATA__"]/text()').get()
