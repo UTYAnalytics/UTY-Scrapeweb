@@ -165,7 +165,7 @@ class WalmartSpider(scrapy.Spider):
             )
             size_variants = find_variant_by_pattern(
                 raw_product_data.get("variantCriteria", []),
-                ".*size.*|.*number_of.*",
+                ".*size.*|.*number_of.*|.*multipack.*",
                 desired_product_id,
             )
 
