@@ -26,8 +26,10 @@ class WalmartSpider(scrapy.Spider):
     def start_requests(self):
         # List of Walmart search URLs
         search_urls = [
-            # "https://www.walmart.com/shop/deals?",
+            "https://www.walmart.com/shop/deals?",
             "https://www.walmart.com/shop/deals/household-essentials?povid=HHE_HHECP_hubspoke_shopbyprice_hhedeals&",
+            "https://www.walmart.com/browse/976759?athcpid=7cbe8a0a-c5fe-4839-a851-edb3ec71638c&athpgid=AthenaContentPage&athznid=athenaModuleZone&athmtid=AthenaItemCarousel&athtvid=4&athena=true&",  # Food
+            "https://www.walmart.com/browse/personal-care/1005862_1071969?povid=EDN_EDNCP_Feb_itemcarousel_carousel_PC&",  # All Bath & Body
             # Add more URLs as needed
         ]
 
