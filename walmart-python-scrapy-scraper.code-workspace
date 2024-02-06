@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../walmart-python-scrapy-scraper"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
