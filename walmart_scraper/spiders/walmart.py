@@ -204,117 +204,146 @@ class WalmartSpider(scrapy.Spider):
                 if pack_variant_title:
                     # Assuming 'pack_variant_title' returns a string that can be passed to 'extract_pack_quantity'
                     pack_quantity = extract_pack_quantity(pack_variant_title)
+            # After extracting product details, calculate price per pack and check availability
+            product_price = raw_product_data["priceInfo"]["currentPrice"].get(
+                "price", 0
+            )
+            product_availabilityStatus = raw_product_data.get("availabilityStatus", "")
+            pack_quantity = (
+                pack_quantity if pack_quantity is not None else 1
+            )  # Ensure pack_quantity is at least 1 to avoid division by zero
 
-            yield {
-                "web_scraper_start_url": "walmart",
-                "product_id": (
-                    raw_product_data.get("id") if raw_product_data.get("id") else None
-                ),
-                "product_type": (
-                    raw_product_data.get("type")
-                    if raw_product_data.get("type")
-                    else None
-                ),
-                "product_title": (
-                    raw_product_data.get("name")
-                    if raw_product_data.get("name")
-                    else None
-                ),
-                "product_brand": (
-                    raw_product_data.get("brand")
-                    if raw_product_data.get("brand")
-                    else None
-                ),
-                "product_rating": (
-                    raw_product_data.get("averageRating")
-                    if raw_product_data.get("averageRating")
-                    else None
-                ),
-                "product_availabilityStatus": (
-                    raw_product_data.get("availabilityStatus")
-                    if raw_product_data.get("availabilityStatus")
-                    else None
-                ),
-                "product_price": (
-                    raw_product_data["priceInfo"]["currentPrice"].get("price")
-                    if raw_product_data["priceInfo"]["currentPrice"].get("price")
-                    else None
-                ),
-                "product_original_price": (
-                    raw_product_data["priceInfo"]["wasPrice"].get("price")
-                    if raw_product_data["priceInfo"]["wasPrice"]
-                    else None
-                ),
-                "product_currencyUnit": (
-                    raw_product_data["priceInfo"]["currentPrice"].get("currencyUnit")
-                    if raw_product_data["priceInfo"]["currentPrice"]
-                    else None
-                ),
-                "product_url_href": (
-                    response.meta["product_url"]
-                    if response.meta["product_url"]
-                    else None
-                ),  # Include product URL in the output
-                "product_sellername": (
-                    raw_product_data.get("sellerName")
-                    if raw_product_data.get("sellerName")
-                    else None
-                ),
-                "product_upc": (
-                    raw_product_data.get("upc") if raw_product_data.get("upc") else None
-                ),
-                "product_sku": (
-                    raw_product_data.get("itemId")
-                    if raw_product_data.get("itemId")
-                    else None
-                ),
-                "product_review_count": (
-                    raw_product_data.get("numberOfReviews")
-                    if raw_product_data.get("numberOfReviews")
-                    else None
-                ),
-                "product_image_1_src": (
-                    raw_product_data["imageInfo"].get("thumbnailUrl")
-                    if raw_product_data["imageInfo"].get("thumbnailUrl")
-                    else None
-                ),
-                "product_image_2_src": (
-                    raw_product_data["imageInfo"]["allImages"][1]["url"]
-                    if len(raw_product_data["imageInfo"]["allImages"]) >= 2
-                    else None
-                ),
-                "product_image_3_src": (
-                    raw_product_data["imageInfo"]["allImages"][2]["url"]
-                    if len(raw_product_data["imageInfo"]["allImages"]) >= 3
-                    else None
-                ),
-                "product_image_4_src": (
-                    raw_product_data["imageInfo"]["allImages"][3]["url"]
-                    if len(raw_product_data["imageInfo"]["allImages"]) >= 4
-                    else None
-                ),
-                "product_image_5_src": (
-                    raw_product_data["imageInfo"]["allImages"][4]["url"]
-                    if len(raw_product_data["imageInfo"]["allImages"]) >= 5
-                    else None
-                ),
-                "product_category": (
-                    raw_product_data["category"]["path"][1]["name"]
-                    if raw_product_data["category"]["path"][1]["name"]
-                    else None
-                ),
-                "product_variants": json.dumps(
-                    {
-                        "attr": attr_variants,
-                        "color": color_variants,
-                        "size": size_variants,
-                        "pack": pack_quantity,
-                    }
-                ),
-                "sys_run_date": datetime.now().strftime(
-                    "%Y-%m-%d"
-                ),  # Include current date
-            }
+            price_per_pack = (
+                product_price / pack_quantity if pack_quantity else float("inf")
+            )  # Calculate price per pack, handle division by zero
+
+            product_sellername = raw_product_data.get("sellerName", "")
+            # Check if price per pack is less than or equal to 55 and product is not out of stock
+            if (
+                price_per_pack <= 55
+                and product_availabilityStatus.lower() != "out_of_stock"
+                and product_sellername.lower() == "walmart.com"
+            ):
+                yield {
+                    "web_scraper_start_url": "walmart",
+                    "product_id": (
+                        raw_product_data.get("id")
+                        if raw_product_data.get("id")
+                        else None
+                    ),
+                    "product_type": (
+                        raw_product_data.get("type")
+                        if raw_product_data.get("type")
+                        else None
+                    ),
+                    "product_title": (
+                        raw_product_data.get("name")
+                        if raw_product_data.get("name")
+                        else None
+                    ),
+                    "product_brand": (
+                        raw_product_data.get("brand")
+                        if raw_product_data.get("brand")
+                        else None
+                    ),
+                    "product_rating": (
+                        raw_product_data.get("averageRating")
+                        if raw_product_data.get("averageRating")
+                        else None
+                    ),
+                    "product_availabilityStatus": (
+                        raw_product_data.get("availabilityStatus")
+                        if raw_product_data.get("availabilityStatus")
+                        else None
+                    ),
+                    "product_price": (
+                        raw_product_data["priceInfo"]["currentPrice"].get("price")
+                        if raw_product_data["priceInfo"]["currentPrice"].get("price")
+                        else None
+                    ),
+                    "product_original_price": (
+                        raw_product_data["priceInfo"]["wasPrice"].get("price")
+                        if raw_product_data["priceInfo"]["wasPrice"]
+                        else None
+                    ),
+                    "product_currencyUnit": (
+                        raw_product_data["priceInfo"]["currentPrice"].get(
+                            "currencyUnit"
+                        )
+                        if raw_product_data["priceInfo"]["currentPrice"]
+                        else None
+                    ),
+                    "product_url_href": (
+                        response.meta["product_url"]
+                        if response.meta["product_url"]
+                        else None
+                    ),  # Include product URL in the output
+                    "product_sellername": (
+                        raw_product_data.get("sellerName")
+                        if raw_product_data.get("sellerName")
+                        else None
+                    ),
+                    "product_upc": (
+                        raw_product_data.get("upc")
+                        if raw_product_data.get("upc")
+                        else None
+                    ),
+                    "product_sku": (
+                        raw_product_data.get("itemId")
+                        if raw_product_data.get("itemId")
+                        else None
+                    ),
+                    "product_review_count": (
+                        raw_product_data.get("numberOfReviews")
+                        if raw_product_data.get("numberOfReviews")
+                        else None
+                    ),
+                    "product_image_1_src": (
+                        raw_product_data["imageInfo"].get("thumbnailUrl")
+                        if raw_product_data["imageInfo"].get("thumbnailUrl")
+                        else None
+                    ),
+                    "product_image_2_src": (
+                        raw_product_data["imageInfo"]["allImages"][1]["url"]
+                        if len(raw_product_data["imageInfo"]["allImages"]) >= 2
+                        else None
+                    ),
+                    "product_image_3_src": (
+                        raw_product_data["imageInfo"]["allImages"][2]["url"]
+                        if len(raw_product_data["imageInfo"]["allImages"]) >= 3
+                        else None
+                    ),
+                    "product_image_4_src": (
+                        raw_product_data["imageInfo"]["allImages"][3]["url"]
+                        if len(raw_product_data["imageInfo"]["allImages"]) >= 4
+                        else None
+                    ),
+                    "product_image_5_src": (
+                        raw_product_data["imageInfo"]["allImages"][4]["url"]
+                        if len(raw_product_data["imageInfo"]["allImages"]) >= 5
+                        else None
+                    ),
+                    "product_category": (
+                        raw_product_data["category"]["path"][1]["name"]
+                        if raw_product_data["category"]["path"][1]["name"]
+                        else None
+                    ),
+                    "product_variants": json.dumps(
+                        {
+                            "attr": attr_variants,
+                            "color": color_variants,
+                            "size": size_variants,
+                            "pack": pack_quantity,
+                        }
+                    ),
+                    "sys_run_date": datetime.now().strftime(
+                        "%Y-%m-%d"
+                    ),  # Include current date
+                }
+            else:
+                self.logger.info(
+                    f"Skipping product {raw_product_data.get('id')} due to price,seller or availability constraints."
+                )
 
     def retry_request(self, response):
         """Retry request with exponential backoff."""
