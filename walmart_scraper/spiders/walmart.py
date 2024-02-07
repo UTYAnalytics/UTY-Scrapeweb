@@ -27,9 +27,8 @@ class WalmartSpider(scrapy.Spider):
         # List of Walmart search URLs
         search_urls = [
             "https://www.walmart.com/shop/deals?facet=retailer_type%3AWalmart&",
-            "https://www.walmart.com/shop/deals/stock-up-essentials?povid=EDN_EDNCP_x_LHN_Savings_GroceriesEssentials&facet=retailer_type%3AWalmart&",
-            "https://www.walmart.com/browse/personal-care&facet=retailer_type%3AWalmart&",
-            "https://www.walmart.com/shop/household-essentials-stock-up?povid=EDN_EDNCP_Feb_itemcarousel_carousel_HHE&facet=retailer_type%3AWalmart&",
+            "https://www.walmart.com/shop/household-essentials-stock-up?povid=EDN_EDNCP_Feb_itemcarousel_carousel_HHE&facet=retailer_type%3AWalmart%7C%7Cexclude_oos%3AShow+available+items+only&",
+            "https://www.walmart.com/browse/health/first-aid/976760_2571007?sort=best_seller&povid=FirstAidCP_Itemcarousel_Firstaidessentials_Rweb_7523&facet=exclude_oos%3AShow+available+items+only%7C%7Cretailer_type%3AWalmart&",
             # Add more URLs as needed
         ]
 
