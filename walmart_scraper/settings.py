@@ -34,7 +34,7 @@ DOWNLOADER_MIDDLEWARES = {
 }
 ITEM_PIPELINES = {
     #    'walmart_scraper.pipelines.PostgresDemoPipeline': 300,
-    "walmart_scraper.pipelinesnew.PostgresNoDuplicatesPipeline": 300,
+    "walmart_scraper.pipelinesnew.PostgresNoDuplicatesPipeline": 800,
 }
 # Max Concurrency On ScrapeOps Proxy Free Plan is 1 thread
 CONCURRENT_REQUESTS = 10
